@@ -23,6 +23,7 @@
     <link rel="stylesheet" type="text/css" href="styles/grapheditor.css">
 	<link rel="stylesheet" media="(forced-colors: active)" href="styles/high-contrast.css" id="high-contrast-stylesheet">
 	<script src="js/bootstrap.js"></script>
+	<script src="js/marknotepro-patches.js"></script>
 	<style type="text/css">
 		.geBlock {
 			z-index:-3;
@@ -36,6 +37,10 @@
 		.geBlock h1, .geBlock h2 {
 			margin-top:0px;
 			padding-top:0px;
+		}
+		/* MarkNotePro provides product attribution outside the Draw.io canvas. */
+		.geTabContainer > a[href="https://github.com/jgraph/drawio"] {
+			display: none !important;
 		}
 	</style>
 </head>

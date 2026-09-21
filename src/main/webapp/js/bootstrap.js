@@ -384,7 +384,7 @@ else
         {
             loadAppJS();
         }
-    })();
+	})();
 }
 
 // Adds basic error handling
@@ -397,5 +397,3 @@ window.onerror = function()
         status.innerHTML = 'Page could not be loaded. Please try refreshing.';
     }
 };
-
-

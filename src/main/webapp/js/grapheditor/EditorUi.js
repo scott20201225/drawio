@@ -6245,6 +6245,20 @@ EditorUi.prototype.createUi = function()
 	{
 		this.toolbarContainer.appendChild(this.toolbar.container);
 		this.container.appendChild(this.toolbarContainer);
+
+		// A newly opened embedded editor has no selection-change event yet.
+		// Seed the edge menus from the default edge style so their icons render.
+		if (this.toolbar.edgeStyleMenu != null)
+		{
+			this.toolbar.edgeStyleMenu.style.backgroundImage = 'url(' +
+				this.getImageForEdgeStyle(graph.currentEdgeStyle) + ')';
+		}
+
+		if (this.toolbar.edgeShapeMenu != null)
+		{
+			this.toolbar.edgeShapeMenu.style.backgroundImage = 'url(' +
+				this.getImageForEdgeShape(graph.currentEdgeStyle) + ')';
+		}
 	}
 
 	// HSplit

@@ -23152,6 +23152,14 @@
 		return result;
 	};
 
+	// Compatibility for extensions built before the plural container API. The
+	// integration bundle may be refreshed independently from app.min.js.
+	EditorUi.prototype.getSelectedLayoutContainer = function()
+	{
+		var containers = this.getSelectedLayoutContainers();
+		return (containers.length > 0) ? containers[0] : null;
+	};
+
 	/**
 	 * Rewrites the childLayout of every selected layout container (see
 	 * getSelectedLayoutContainers) to the given spec in one undoable edit
