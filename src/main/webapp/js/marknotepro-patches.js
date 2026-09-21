@@ -5,6 +5,83 @@
  * editor usable while the upstream compressed extension bundle is refreshed.
  */
 (function () {
+	function getMarkNoteProThemeColors() {
+		if (typeof urlParams === 'undefined' || urlParams.marknoteproThemeColors == null) return null;
+
+		try {
+			var colors = JSON.parse(decodeURIComponent(urlParams.marknoteproThemeColors));
+			return colors != null && typeof colors === 'object' ? colors : null;
+		}
+		catch (e) {
+			return null;
+		}
+	}
+
+	function getMarkNoteProThemeColor(colors, name, fallback) {
+		var value = colors != null ? colors[name] : null;
+
+		// Theme values originate from MarkNotePro's computed CSS variables. Keep
+		// the embedded editor defensive when a handcrafted file URL is opened.
+		return (typeof value === 'string' && value.length < 160 && !/[<>{};]/.test(value)) ? value : fallback;
+	}
+
+	function applyMarkNoteProTheme() {
+		var colors = getMarkNoteProThemeColors();
+		if (colors == null) return;
+
+		var panel = getMarkNoteProThemeColor(colors, 'sideBarBgColor', '#f1f3f4');
+		var toolbar = getMarkNoteProThemeColor(colors, 'itemBgColor', panel);
+		var workspace = getMarkNoteProThemeColor(colors, 'editorBgColor', '#ffffff');
+		var dialog = getMarkNoteProThemeColor(colors, 'floatBgColor', toolbar);
+		var field = getMarkNoteProThemeColor(colors, 'inputBgColor', dialog);
+		var text = getMarkNoteProThemeColor(colors, 'editorColor', '#3f3f3f');
+		var border = getMarkNoteProThemeColor(colors, 'tableBorderColor', '#dadada');
+		var hover = getMarkNoteProThemeColor(colors, 'floatHoverColor', '#e2e2e2');
+		var selected = getMarkNoteProThemeColor(colors, 'themeColor20', hover);
+		var selectedHover = getMarkNoteProThemeColor(colors, 'themeColor30', selected);
+		var accent = getMarkNoteProThemeColor(colors, 'themeColor', '#0071e3');
+		var style = document.getElementById('marknotepro-theme-variables');
+
+		if (style == null) {
+			style = document.createElement('style');
+			style.id = 'marknotepro-theme-variables';
+			document.head.appendChild(style);
+		}
+
+		// Draw.io resolves its UI through light-dark() pairs. Both values receive
+		// the MarkNotePro palette; the regular dark-mode flag still controls its
+		// dark-specific icons, grid behaviour and dialog variants.
+		style.textContent = ':root{' +
+			'--ge-panel-color:' + panel + ';--ge-dark-panel-color:' + panel + ';' +
+			'--toolbar-color:' + toolbar + ';--dark-toolbar-color:' + toolbar + ';' +
+			'--workspace-color:' + workspace + ';--dark-workspace-color:' + workspace + ';' +
+			'--dialog-color:' + dialog + ';--dark-dialog-color:' + dialog + ';' +
+			'--field-color:' + field + ';--dark-field-color:' + field + ';' +
+			'--card-color:' + toolbar + ';--dark-card-color:' + toolbar + ';' +
+			'--soft-color:' + hover + ';--dark-soft-color:' + hover + ';' +
+			'--soft-hover-color:' + hover + ';--dark-soft-hover-color:' + hover + ';' +
+			'--text-color:' + text + ';--dark-text-color:' + text + ';' +
+			'--strong-text-color:' + text + ';--dark-strong-text-color:' + text + ';' +
+			'--secondary-text-color:' + text + ';--dark-secondary-text-color:' + text + ';' +
+			'--border-color:' + border + ';--dark-border-color:' + border + ';' +
+			'--field-border-color:' + border + ';--dark-field-border-color:' + border + ';' +
+			'--strong-border-color:' + border + ';--dark-strong-border-color:' + border + ';' +
+			'--highlight-color:' + hover + ';--dark-highlight-color:' + hover + ';' +
+			'--scrollbar-color:' + hover + ';--dark-scrollbar-color:' + hover + ';' +
+			'--primary-color:' + selected + ';--primary-hover-color:' + selectedHover + ';' +
+			'--accent-color:' + selected + ';--dark-accent-color:' + selected + ';' +
+			'--accent-hover-color:' + selectedHover + ';--dark-active-accent-color:' + selectedHover + ';' +
+			'--accent-text-color:' + accent + ';--dark-accent-text-color:' + accent + ';' +
+			'--focus-color:' + accent + ';--dark-focus-color:' + accent + ';' +
+		'}';
+
+		if (typeof Editor !== 'undefined') {
+			Editor.pageBackgroundColor = workspace;
+			Editor.darkColor = workspace;
+			Editor.darkPageBackgroundColor = workspace;
+		}
+	}
+
 	function applyPatches() {
 		if (typeof EditorUi === 'undefined' || EditorUi.prototype == null) {
 			window.setTimeout(applyPatches, 0);
@@ -22,6 +99,7 @@
 		var createToolbar = EditorUi.prototype.createToolbar;
 		if (createToolbar == null || createToolbar.marknoteproPatched) return;
 		var createUi = EditorUi.prototype.createUi;
+		applyMarkNoteProTheme();
 
 		if (createUi != null && !createUi.marknoteproMenubarPatched) {
 			function createUiWithoutMenubar() {
